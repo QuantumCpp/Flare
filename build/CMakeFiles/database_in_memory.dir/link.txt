@@ -1,1 +1,0 @@
-/usr/bin/clang++ -g -fsanitize=address,undefined -Xlinker --dependency-file=CMakeFiles/database_in_memory.dir/link.d CMakeFiles/database_in_memory.dir/src/main.cpp.o -o database_in_memory

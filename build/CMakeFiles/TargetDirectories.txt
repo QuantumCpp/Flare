@@ -1,3 +1,0 @@
-/home/arch/Documents/Proyectos/in-memory-database-system/build/CMakeFiles/database_in_memory.dir
-/home/arch/Documents/Proyectos/in-memory-database-system/build/CMakeFiles/edit_cache.dir
-/home/arch/Documents/Proyectos/in-memory-database-system/build/CMakeFiles/rebuild_cache.dir
