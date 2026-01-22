@@ -9,9 +9,14 @@
 
 enum class TypeToken{
   Command,
-  Flags,
-  OptionWithValue,
+  Option,
   Positional
+};
+
+enum class ValuePolicy{
+  None,
+  Required,
+  Optional
 };
 
 struct Token{
@@ -30,45 +35,55 @@ void list(std::vector<std::string> arg){
 
 int main(int argc, const char* argv[] ){
   std::vector<std::string> arguments(argv + 1 , argv + argc);
-  std::unordered_map<std::string, bool> Options{
-    {"-f" , false},
-    {"-t" , false},
-    {"-e" , false},
-    {"-s" , false},
-    {"--extension" , true},
-    {"--size", true}
-  };
   std::vector<Token> tokens;
 
   bool OptionOnlyPositional = false;
   bool CommandFound = false;
 
+  std::unordered_map<std::string,ValuePolicy> CommandSpec = {
+    {"list" , ValuePolicy::Optional}
+  };
+  std::unordered_map<std::string,ValuePolicy> OptionSpec = {
+    {"--extension", ValuePolicy::Required},
+    {"-e" , ValuePolicy::Optional},
+    {"-s" , ValuePolicy::Optional},
+    {"-d" , ValuePolicy::Optional},
+
+  };
+
   for(size_t i = 0 ; i < arguments.size() ; i++){
     const std::string& args = arguments[i];
+
+    //Detectar solo opciones luego del --
     if(args == "--"){
       OptionOnlyPositional = true;
       continue;
     }
     
+    //Detectar los comandos 
     if (!OptionOnlyPositional && !StartWith(args, "-") && !CommandFound){
       tokens.emplace_back(Token{TypeToken::Command, args, ""});
       CommandFound = true;
       continue;
     }
     
+    //Detectar las opciones con o sin valor
     if(!OptionOnlyPositional && StartWith(args, "-")){
+      auto pos = args.find("=");
       if(StartWith(args,"--")){
-        auto pos = args.find("="); //Retorna Npos si no hay valor = en el argumento
+        //Si existe el simbolo guarda la opcion y su valor asociado
         if (pos != std::string::npos){
-          tokens.emplace_back(Token{TypeToken::OptionWithValue, args.substr(0, pos), args.substr(pos + 1)});
+          tokens.emplace_back(Token{TypeToken::Option, args.substr(0, pos), args.substr(pos + 1)});
 
         }
+        //Si no existe tambien guarda la opcion pero sin un valor asociado
         else{
-          tokens.emplace_back(Token{TypeToken::OptionWithValue, args, ""});
+          tokens.emplace_back(Token{TypeToken::Option, args, ""});
         }
         continue;
       }
-      tokens.emplace_back(Token{TypeToken::Flags, args, ""});
+
+      tokens.emplace_back(Token{TypeToken::Option, args, ""});
       continue;
     }
 
@@ -77,5 +92,12 @@ int main(int argc, const char* argv[] ){
       continue;
     }
   }
+  if(CommandFound == false){
+    std::cout<<"Commmand not found\n";
+  }
+  else{
+    std::cout<<"Command found\n";
+  }
+  return 0;
 }
 
