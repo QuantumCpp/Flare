@@ -34,6 +34,7 @@ std::vector<Token> Tokenization(std::vector<std::string> args){
           tokens.emplace_back(Token{TypeToken::Option, arg.substr(0, pos), arg.substr(pos + 1)});
 
         }
+
         //Si no existe tambien guarda la opcion pero sin un valor asociado
         else{
           tokens.emplace_back(Token{TypeToken::Option, arg, ""});

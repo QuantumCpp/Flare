@@ -8,6 +8,7 @@ ValidationError Validation(std::vector<Token>& tokens){
   int CommandFound = 0;
   int CantSeparationFound = 0;
   bool SeparationFound = false;
+
   std::unordered_map<std::string ,int>SeenOption;
 
   for (size_t i = 0 ; i < tokens.size() ; i ++){
@@ -50,8 +51,14 @@ ValidationError Validation(std::vector<Token>& tokens){
           SeenOption[token.name] = true;
           continue;
         }
-         if (OptionSpec.at(token.name) == ValuePolicy::None && token.value != "") {return ValidationError::OptionNotRequiredValue; } 
-         if (OptionSpec.at(token.name) == ValuePolicy::Required && token.value == "") {return ValidationError::OptionRequiredValue; }
+         if (OptionSpec.at(token.name) == ValuePolicy::None && token.value != "") 
+         {
+           return ValidationError::OptionNotRequiredValue; 
+         } 
+         if (OptionSpec.at(token.name) == ValuePolicy::Required && token.value == "") 
+         {
+           return ValidationError::OptionRequiredValue; 
+         }
       }
       else{
         return ValidationError::OptionNotFound;
