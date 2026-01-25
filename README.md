@@ -1,126 +1,128 @@
-# File‑Manager — Intelligent File Manager
+# File‑Manager — Gestor de Archivos Inteligente
 
-> **A pragmatic CLI for mastering file I/O, filesystem tooling and robust batch operations.**
+> **Una CLI pragmática para dominar I/O de archivos, `std::filesystem` y operaciones batch robustas.**
 
 ---
 
-## ✨ Overview
+## ✨ Visión general
 
-File‑Manager is a focused command‑line utility written in C++ that brings together practical filesystem work (traversal, metadata, I/O) with production‑grade patterns: clear phases, deterministic behavior, and defensive failure modes. This repo is both a learning vehicle and a tool you can use daily.
+File‑Manager es una herramienta de línea de comandos escrita en C++ cuyo objetivo es unir trabajo real con el sistema de archivos (recorrido de directorios, metadatos, I/O) y patrones de diseño propios de software de calidad profesional: fases bien definidas, comportamiento determinista y manejo defensivo de errores.
 
-## 🎯 Goals
+Este repositorio es **a la vez una herramienta utilizable y un proyecto de aprendizaje profundo**, enfocado en entender cómo se construye una CLI sólida desde cero.
 
-* Achieve confidence with file I/O (binary and text), directory recursion and metadata.
-* Build a small but solid command ecosystem for advanced file tasks.
-* Prioritize correctness, reproducibility, and predictable performance.
+## 🎯 Objetivos
 
-## 🔧 What it does
+* Dominar I/O de archivos (texto y binario).
+* Comprender y usar correctamente `std::filesystem` para navegación y metadatos.
+* Diseñar un pequeño ecosistema de comandos extensible.
+* Priorizar corrección, reproducibilidad y rendimiento predecible.
 
-A compact feature list that prioritizes usefulness and clarity:
+## 🔧 Funcionalidades
 
-* **List files** with flexible filters (extension, size, dates).
-* **Search** by name or by content (pattern / text scan).
-* **Batch operations:** copy, move, rename with filters and dry‑run mode.
-* **Duplicate detection** using checksums (MD5 / SHA‑256) and fast prefilters (size, partial hash).
-* **Auto‑organize** files into structured folders (by type, date, or custom rules).
-* **Dir compare & sync**: detect missing/changed files and produce sync plans.
-* **Reports**: largest files, oldest files, summary statistics.
+Un conjunto compacto pero potente de operaciones:
 
-## 🧭 Core concepts practiced
+* **Listado de archivos** con filtros por extensión, tamaño y fechas.
+* **Búsqueda** por nombre o por contenido (escaneo de texto / patrones).
+* **Operaciones batch**: copiar, mover y renombrar con filtros y modo *dry‑run*.
+* **Detección de duplicados** usando checksums (MD5 / SHA‑256) y prefiltros (tamaño, hash parcial).
+* **Organización automática** de archivos por tipo, fecha u otras reglas.
+* **Comparación y sincronización de directorios** con planes de acción reproducibles.
+* **Reportes**: archivos más grandes, más antiguos y estadísticas resumidas.
 
-* Binary and text file I/O
-* Recursive directory traversal and robust error handling
-* Cross‑platform path handling via `std::filesystem`
-* Efficient filtering and sorting of large file sets
-* Hashing for reliable duplicate detection
+## 🧭 Conceptos clave que se practican
 
-## 🧱 Architecture (high level)
+* I/O de archivos binarios y de texto
+* Recursión de directorios con manejo robusto de errores
+* Manejo multiplataforma de rutas (`std::filesystem::path`)
+* Filtrado, ordenamiento y búsqueda eficiente sobre grandes conjuntos
+* Hashing para comparación fiable de archivos
 
-The CLI is designed in clear, testable stages:
+## 🧱 Arquitectura (alto nivel)
 
-1. **Tokenization** — lexical classification of the command line.
-2. **Canonicalization** — alias resolution (planned), normalization of token identity.
-3. **Validation** — semantic checks, policy enforcement, normalization of duplicates.
-4. **Execution** — perform filesystem operations using safe, retryable primitives.
+La CLI está organizada en fases explícitas y desacopladas:
 
-Keeping each stage focused makes the system easier to extend and reason about.
+1. **Tokenización**
+   Clasificación léxica de la línea de comandos (Command, Option, Positional, Separation).
 
-## ⚙️ Tech stack & libraries
+2. **Canonización** *(planificada)*
+   Resolución de alias (`-e` ↔ `--extension`), normalización de nombres y forma canónica de opciones.
 
-Minimal dependencies; mostly standard C++:
+3. **Validación**
+   Verificación semántica: comandos válidos, opciones permitidas por comando, políticas de valores, eliminación de duplicados.
 
-* `std::filesystem` — traversal, metadata, path ops
-* `std::fstream` / low‑level I/O — reading/writing files
-* STL containers & algorithms — `vector`, `unordered_map`, `sort`, `find`
-* Hash routines (MD5/SHA‑256): either lightweight internal implementation or a tiny, audited header
+4. **Ejecución**
+   Operaciones reales sobre el sistema de archivos usando primitivas seguras y verificables.
 
-No heavy external frameworks — the point is to master fundamentals.
+Esta separación reduce acoplamiento y permite escalar el sistema sin reescrituras grandes.
 
-## ✅ Success criteria
+## ⚙️ Tecnologías y librerías
 
-A pragmatic set of acceptance tests:
+Dependencias mínimas, mayormente estándar:
 
-* Process **10,000 files** within target time (benchmark target configurable).
-* Correctly identify duplicates via checksums, with prefiltering for speed.
-* Directory synchronization produces an accurate plan and can apply it safely.
-* Robustness under read errors, permission failures and malformed files.
+* `std::filesystem` — navegación, metadatos, paths
+* `std::fstream` y I/O de bajo nivel — lectura y escritura de archivos
+* STL — `vector`, `unordered_map`, algoritmos (`sort`, `find`, etc.)
+* Hashing (MD5 / SHA‑256) — implementación interna ligera o headers auditados
 
-## 🔮 Roadmap & Pending Items
+El objetivo es **dominar los fundamentos**, no esconder complejidad tras frameworks.
 
-These items are intentionally postponed or marked as next steps. They are ordered by priority.
+## ✅ Criterios de éxito
 
-**CLI & Parsing**
+* Procesar **10,000 archivos** dentro de un tiempo objetivo configurable.
+* Detectar duplicados correctamente mediante checksums.
+* Sincronización de directorios con detección precisa de diferencias.
+* Robustez frente a archivos corruptos, errores de lectura y permisos denegados.
 
-* [ ] Canonicalization: alias table (`-e` ↔ `--extension`) and Option canonical names.
-* [ ] Prefer the option token that contains a value when duplicates exist (value wins).
-* [ ] Support `ValuePolicy::Optional` semantics and clearer diagnostics.
+## 🔮 Roadmap y pendientes
 
-**Validation & UX**
+Estas tareas están **deliberadamente postergadas** o planificadas para la siguiente fase de madurez del proyecto.
 
-* [ ] Improve error messages (include token index, offending string).
-* [ ] Add strict vs permissive validation modes.
-* [ ] Provide detailed dry‑run output for destructive commands.
+### CLI y Parsing
 
-**Execution & Performance**
+* [ ] Tabla de alias (canonización): `-e` ↔ `--extension` → nombre canónico único.
+* [ ] Resolver duplicados de opciones prefiriendo la variante con valor asociado.
+* [ ] Soporte completo para `ValuePolicy::Optional`.
+* [ ] Separación clara entre errores léxicos y semánticos.
 
-* [ ] Add a robust `FileWorker` abstraction to handle retries / concurrency.
-* [ ] Implement partial hashing to accelerate duplicate detection (size → partial hash → full hash).
-* [ ] Add benchmarks and CI profiling to guard performance targets.
+### Validación y UX
 
-**Advanced**
+* [ ] Mensajes de error más expresivos (índice del token, texto original).
+* [ ] Modo estricto vs modo permisivo de validación.
+* [ ] Diagnósticos detallados en *dry‑run*.
 
-* [ ] Add rule engine for automatic organization (user‑configurable rules).
-* [ ] Add plugin/handler model for custom commands.
+### Ejecución y rendimiento
 
-## 🧩 Design principles
+* [ ] Abstracción `FileWorker` para manejo centralizado de errores y reintentos.
+* [ ] Hashing por etapas: tamaño → hash parcial → hash completo.
+* [ ] Benchmarks automáticos y perfiles de rendimiento (CI).
 
-* **Explicit > implicit.** No magic: behavior must be discoverable.
-* **Fail safe.** Operations default to non‑destructive (dry‑run first).
-* **Composable.** Small building blocks (tokenization, validation, executor).
-* **Minimal external deps.** Rely on std C++ and audited small libraries.
+### Escalado profesional
 
-## 📝 Usage (draft)
+* [ ] Especificación formal de comandos y opciones (schema interno).
+* [ ] Arquitectura orientada a *handlers* o *command objects*.
+* [ ] Posible soporte para concurrencia controlada.
+* [ ] Documentación técnica (`ARCHITECTURE.md`) con diagramas de flujo.
+
+## 🧩 Principios de diseño
+
+* **Explícito > implícito**: el comportamiento debe ser visible y razonable.
+* **Fail‑safe**: por defecto no destructivo (dry‑run primero).
+* **Composable**: fases pequeñas y bien definidas.
+* **Dependencias mínimas**: estándar C++ siempre que sea posible.
+
+## 📝 Uso (borrador)
 
 ```
-# list by extension, recursive
+# listar por extensión de forma recursiva
 file-manager list --extension=jpg --recursive
 
-# find duplicates and generate a report
+# buscar duplicados y generar reporte
 file-manager find-duplicates --hash=sha256 --output=dupes.csv
 
-# dry-run move by year
+# organizar por año en modo dry-run
 file-manager organize --by=year --dry-run
 ```
 
-## 📜 License
+## 📜 Licencia
 
-See the `LICENSE` file in the repository root.
-
----
-
-*If you want, I can also:*
-
-* add a short `ARCHITECTURE.md` (token flow diagram + module map), or
-* produce a concrete `alias table` stub and show how Canonicalization integrates with `Validation`.
-
-Which of those should I do next?
+Consulta el archivo `LICENSE` en la raíz del repositorio.
