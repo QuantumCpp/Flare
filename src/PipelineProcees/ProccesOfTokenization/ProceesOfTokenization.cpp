@@ -23,7 +23,7 @@ std::vector<Token> Tokenization(const std::vector<std::string>& args){
     }
 
     //Comprobacion del comando principal en la posicion 0
-    if(i == 0 && !CommandFound && !OnlyPositionArguments){
+    if(i == 0 && !CommandFound && !OnlyPositionArguments && !StartWith(arguments,"-")){
       token.emplace_back(Token{TypeToken::Command , arguments , ""});
       CommandFound = true;
       continue;
