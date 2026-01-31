@@ -19,7 +19,14 @@ int main(int argc, char* argv[]){
 
   //Tomar todas los argumentos en crudo dados por el usuario a excepcio del nombre del ejecutable
   std::vector<std::string> ArgumentsRaw(argv + 1, argv + argc);
-  
+
+  //Verificar si el ArgumentsRaw esta vacio, en caso de estarlo llamar al helper
+  if(ArgumentsRaw.empty()){
+    //FunctionHelper(); *Implementacion futura
+    std::cerr<<"No se anadio ningun argumento";
+    return 1;
+  }
+
   //Realizar el proceso de tokenizacion y guardarlos en una variable
   std::vector<Token> TokenRaw = Tokenization(ArgumentsRaw);
   TokenGroup TokenGroupRaw;
