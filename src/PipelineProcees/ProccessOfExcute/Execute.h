@@ -3,5 +3,6 @@
 #include "../../SystemUtilites/OptionRegistry/OptionRegistry.h"
 #include "../../SystemUtilites/Structs/TokenGroup.h"
 #include "../../Commands/CommandList/list.h"
+#include "../../SystemUtilites/EnumsClass/ValidationError.h"
 
-void ExecutedProccess(const TokenGroup& TokenGroupValidated);
+ValidationError ExecutedProccess(const TokenGroup& TokenGroupValidated);
