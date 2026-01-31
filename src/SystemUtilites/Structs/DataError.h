@@ -8,5 +8,8 @@ struct DataErrorDetail{
   std::string NameError;
   std::string ShortDetail;
 
-  std::function<void(const DataErrorDetail&, const std::string&  )> handler;
+  std::function<void(const DataErrorDetail*)> handler;
 };
+
+
+
