@@ -8,7 +8,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::EmptyInput;
         err.NameError = "EmptyArguments";
         err.ShortDetail = "No se introdujo ningun elemento";
-        //err.handler = PrintEmptyInputError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -17,7 +17,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidSyntax;
         err.NameError = "InvalidSyntax";
         err.ShortDetail = "La sintaxis de entrada es invalida";
-        //err.handler = PrintInvalidSyntaxError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -27,7 +27,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::NoCommand;
         err.NameError = "NoCommand";
         err.ShortDetail = "No se encontro ningun comando";
-        //err.handler = PrintNoCommandError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -36,7 +36,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::MultipleCommands;
         err.NameError = "MultipleCommands";
         err.ShortDetail = "Se detectaron multiples comandos";
-        //err.handler = PrintMultipleCommandsError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -45,7 +45,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::CommandNotFound;
         err.NameError = "CommandNotFound";
         err.ShortDetail = "El comando no existe";
-        //err.handler = PrintCommandNotFoundError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -54,7 +54,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::CommandIncorrectPosition;
         err.NameError = "CommandIncorrectPosition";
         err.ShortDetail = "El comando no esta en la posicion correcta";
-        //err.handler = PrintCommandIncorrectPositionError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -64,7 +64,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::OptionNotFound;
         err.NameError = "OptionNotFound";
         err.ShortDetail = "La opcion no existe";
-        //err.handler = PrintOptionNotFoundError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -73,7 +73,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::OptionForWrongCommand;
         err.NameError = "OptionForWrongCommand";
         err.ShortDetail = "La opcion no pertenece a este comando";
-        //err.handler = PrintOptionForWrongCommandError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -82,7 +82,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::DuplicateOption;
         err.NameError = "DuplicateOption";
         err.ShortDetail = "La opcion fue especificada multiples veces";
-        //err.handler = PrintDuplicateOptionError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -91,7 +91,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::OptionRequiresValue;
         err.NameError = "OptionRequiresValue";
         err.ShortDetail = "La opcion requiere un valor";
-        //err.handler = PrintOptionRequiresValueError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -100,7 +100,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::OptionDoesNotAcceptValue;
         err.NameError = "OptionDoesNotAcceptValue";
         err.ShortDetail = "La opcion no acepta valores";
-        //err.handler = PrintOptionDoesNotAcceptValueError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -109,7 +109,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::ValueNotProvided;
         err.NameError = "ValueNotProvided";
         err.ShortDetail = "No se proporciono un valor valido";
-        //err.handler = PrintValueNotProvidedError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -119,7 +119,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidValueType_Integer;
         err.NameError = "InvalidInteger";
         err.ShortDetail = "Se esperaba un entero valido";
-        //err.handler = PrintInvalidIntegerError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -128,7 +128,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidValueType_Float;
         err.NameError = "InvalidFloat";
         err.ShortDetail = "Se esperaba un flotante valido";
-        //err.handler = PrintInvalidFloatError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -137,7 +137,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidValueType_Path;
         err.NameError = "InvalidPath";
         err.ShortDetail = "La ruta proporcionada es invalida";
-        //err.handler = PrintInvalidPathError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -146,7 +146,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidValueType_Date;
         err.NameError = "InvalidDate";
         err.ShortDetail = "El formato de fecha es invalido";
-       // err.handler = PrintInvalidDateError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -155,7 +155,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::ValueOutOfRange;
         err.NameError = "ValueOutOfRange";
         err.ShortDetail = "El valor esta fuera del rango permitido";
-        //err.handler = PrintValueOutOfRangeError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -164,7 +164,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::InvalidChoice;
         err.NameError = "InvalidChoice";
         err.ShortDetail = "El valor no es una opcion valida";
-        //err.handler = PrintInvalidChoiceError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -174,7 +174,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::ConflictingOptions;
         err.NameError = "ConflictingOptions";
         err.ShortDetail = "Opciones mutuamente excluyentes";
-        //err.handler = PrintConflictingOptionsError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -183,7 +183,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::ConflictingValues;
         err.NameError = "ConflictingValues";
         err.ShortDetail = "Los valores entran en conflicto";
-        //err.handler = PrintConflictingValuesError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -193,7 +193,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::MissingRequiredOption;
         err.NameError = "MissingRequiredOption";
         err.ShortDetail = "Falta una opcion requerida";
-        //err.handler = PrintMissingRequiredOptionError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -202,7 +202,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::MissingRequiredPositional;
         err.NameError = "MissingRequiredPositional";
         err.ShortDetail = "Falta un argumento posicional requerido";
-        //err.handler = PrintMissingRequiredPositionalError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -211,7 +211,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::TooManyPositionals;
         err.NameError = "TooManyPositionals";
         err.ShortDetail = "Demasiados argumentos posicionales";
-        //err.handler = PrintTooManyPositionalsError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -220,7 +220,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::TooFewPositionals;
         err.NameError = "TooFewPositionals";
         err.ShortDetail = "Faltan argumentos posicionales";
-        //err.handler = PrintTooFewPositionalsError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -230,7 +230,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathDoesNotExist;
         err.NameError = "PathDoesNotExist";
         err.ShortDetail = "La ruta no existe";
-        //err.handler = PrintPathDoesNotExistError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -239,7 +239,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathNotDirectory;
         err.NameError = "PathNotDirectory";
         err.ShortDetail = "La ruta no es un directorio";
-        //err.handler = PrintPathNotDirectoryError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -248,7 +248,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathNotFile;
         err.NameError = "PathNotFile";
         err.ShortDetail = "La ruta no es un archivo";
-        //err.handler = PrintPathNotFileError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -257,7 +257,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathNotReadable;
         err.NameError = "PathNotReadable";
         err.ShortDetail = "No hay permisos de lectura";
-        //err.handler = PrintPathNotReadableError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -266,7 +266,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathNotWritable;
         err.NameError = "PathNotWritable";
         err.ShortDetail = "No hay permisos de escritura";
-        //err.handler = PrintPathNotWritableError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -276,7 +276,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::MultipleSeparators;
         err.NameError = "MultipleSeparators";
         err.ShortDetail = "Se detectaron multiples separadores '--'";
-        //err.handler = PrintMultipleSeparatorsError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -285,7 +285,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::UnknownError;
         err.NameError = "UnknownError";
         err.ShortDetail = "Error desconocido";
-        //err.handler = PrintUnknownError;
+        err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
 }
