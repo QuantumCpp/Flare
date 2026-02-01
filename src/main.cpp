@@ -1,14 +1,15 @@
-#include "SystemUtilites/EnumsClass/ValidationError.h"
-#include "SystemUtilites/MessageErrorDetail/RegisterError/RegisterError.h"
-#include "SystemUtilites/Structs/DataError.h"
-#include "SystemUtilites/Structs/TokenGroup.h"
-#include "Utils/RegisterAllCommands/RegisterAllCommands.h"
-#include "Utils/RegisterAllOptions/RegisterAllOptions.h"
-#include "PipelineProcees/ProccesOfTokenization/ProccesOfTokenization.h"
-#include "PipelineProcees/ProccesOfClasification/ProceesOfClasification.h"
-#include "PipelineProcees/ProceesOfValidationTokens/ProceesOfValidationTokens.h"
-#include "PipelineProcees/ProccessOfExcute/Execute.h"
-#include "SystemUtilites/MessageErrorDetail/MessageError.h"
+#include <vector>
+#include <iostream>
+#include "system/registry/option/register_all.h"
+#include "system/registry/command/register_all.h"
+#include "system/errors/data_error_register.h"
+#include "system/types/Token.h"
+#include "system/types/TokenGroup.h"
+#include "core/tokenization/tokenization.h"
+#include "core/classification/classification.h"
+#include "core/validation/validation.h"
+#include "core/execution/execution.h"
+#include "system/registry/error/error_registry.h"
 
 
 int main(int argc, char* argv[]){
@@ -44,7 +45,7 @@ int main(int argc, char* argv[]){
   };
   
   //Realiar proceso de validacion
-  ErrorSuccess = ValidationDataToken(TokenRaw,TokenGroupRaw); 
+  ErrorSuccess = ValidationDataToken(TokenGroupRaw); 
   if(ErrorSuccess != ValidationError::AllCorrect){
     ErrorDetail = GetError(ErrorSuccess);
     if(ErrorDetail){
