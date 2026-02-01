@@ -1,18 +1,17 @@
 #include "list.h"
-#include <filesystem>
 
 ValidationError CommandList(const TokenGroup &TokenGroupRaw){
   
-  std::vector<Token> TokenOption;
-  std::vector<Token> TokenPositional;
+  std::vector<Token> TokenOption = TokenGroupRaw.option;
+  std::unordered_set<std::string> OptionFind;
+  std::vector<Token> TokenPositional = TokenGroupRaw.positional;
   std::filesystem::path path = std::filesystem::current_path();  
-
 
   //Listar elementos de una carpeta sin opciones anadidas
   if(TokenOption.empty() && !TokenPositional.empty()){
     
     //Primer recorrido sobre el vector de Posicionales para ver si lo introducido es una carpeta real
-    int NumberDirectoryNotExist = 0;
+    long unsigned int NumberDirectoryNotExist = 0;
     for(const auto& file : TokenPositional){
       path = file.name;
       if(!std::filesystem::directory_entry(path).exists()){
@@ -32,7 +31,7 @@ ValidationError CommandList(const TokenGroup &TokenGroupRaw){
     if(NumberDirectoryNotExist == TokenPositional.size()){
       return ValidationError::PathDoesNotExist;
     }
-
   }
+
   return ValidationError::AllCorrect;
 }

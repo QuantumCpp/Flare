@@ -1,6 +1,6 @@
 #include "Execute.h"
 
-ValidationError ExecuteProccess(const TokenGroup& TokenGroupValidate){
+ValidationError ExecutedProccess(const TokenGroup& TokenGroupValidate){
   //Seleccionamos el tope del token group debido a que solo deberia haber uno no habra problema
   Token CommandSelect = TokenGroupValidate.command.front();
   const CommandMetaData* Command = FindCommand(CommandSelect.name);
