@@ -3,4 +3,4 @@
 #include <vector>
 #include "../../system/types/TokenGroup.h"
 
-ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw);
+bool ValidationDataToken(TokenGroup& TokenGroupRaw);

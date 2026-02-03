@@ -3,9 +3,11 @@
 #include "../../system/types/CommandMetaData.h"
 #include "../../system/registry/command/command_registry.h"
 #include "../../system/registry/option/option_registry.h"
-#include <unordered_set>
+#include "../../system/registry/error/error_registry.h"
 #include "../../utils/date_validator.h"
 #include <charconv>
+#include <unordered_set>
+
 
 /*
  Por convencion semantica las opciones largas (o cortas) con valor deben darse de la forma
@@ -18,12 +20,13 @@ ValidationError ValidationTypeValueCorrect(const OptionMetaData* OptionData ,con
 bool IsInteger(const std::string& str);
 bool IsFloat(const std::string& str);
 
-ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw){
+bool ValidationDataToken(TokenGroup& TokenGroupRaw){
   
   std::vector<Token> GroupCommandToken = TokenGroupRaw.command;
   const std::vector<Token> GroupOptionToken = TokenGroupRaw.option;
   const CommandMetaData* CommandData;
   const OptionMetaData* OptionData;
+  const DataErrorDetail* ErrorData;
 
   CommandData = FindCommand(GroupCommandToken.front().name);
   //Comprobar si el comando admite las opciones introducidas
@@ -32,18 +35,24 @@ ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw){
     OptionData = FindOption(OptionToken.name);
     
     if(OptionData == nullptr){
-      return ValidationError::OptionNotFound;
+      ErrorData = GetError(ValidationError::OptionNotFound);
+      ErrorData->handler(ErrorData);
+      return false;
     }
 
     if(!CommandData->options.count(OptionToken.name)){
-      return ValidationError::OptionForWrongCommand;
+      ErrorData = GetError(ValidationError::OptionForWrongCommand);
+      ErrorData->handler(ErrorData);
+      return false;
     }
     //Comprobar si una opcion tiene conflictos con otras introducidas
     for(size_t j = i+1 ; j < GroupOptionToken.size() ; j++){
       Token ConflictToken = GroupOptionToken[j];
       for(const auto& ElementConflict : OptionData->conflicts_with){
         if(ConflictToken.name == ElementConflict){
-          return ValidationError::ConflictingOptions;
+          ErrorData = GetError(ValidationError::ConflictingOptions); 
+          ErrorData->handler(ErrorData);
+          return false;
         }
       }
     }
@@ -51,14 +60,18 @@ ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw){
     //Comprobar si una opcion con politica de valor obligatoria tiene un valor aninado;
     if(OptionData->value_policy == ValuePolicy::Required){
       if(OptionToken.value == ""){
-        return ValidationError::OptionRequiresValue;
+        ErrorData = GetError(ValidationError::OptionRequiresValue);
+        ErrorData->handler(ErrorData);
+        return false;
       }
     }
     
     //Comprobar si una opcion con politica de valor no requerido tiene un valor anidado
     if(OptionData->value_policy == ValuePolicy::None){
       if(OptionToken.value != ""){
-        return ValidationError::OptionDoesNotAcceptValue;
+        ErrorData = GetError(ValidationError::OptionRequiresValue);
+        ErrorData->handler(ErrorData);
+        return false;
       }
     }
 
@@ -72,7 +85,9 @@ ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw){
 
       for(const auto& ElementExist : OptionData->requieres){
         if(SetToken.count(ElementExist) == 0){
-          return ValidationError::MissingRequiredOption;
+          ErrorData = GetError(ValidationError::MissingRequiredOption);
+          ErrorData->handler(ErrorData);
+          return false;
         };
       }
     }
@@ -81,13 +96,15 @@ ValidationError ValidationDataToken(TokenGroup& TokenGroupRaw){
     if(OptionToken.value != ""){
       ValidationError Error = ValidationTypeValueCorrect(OptionData,OptionToken); 
       if(Error != ValidationError::AllCorrect){
-        return Error;
+        ErrorData = GetError(Error);
+        ErrorData->handler(ErrorData);
+        return false;
       };
     }
 
   }
 
-  return ValidationError::AllCorrect;
+  return true;
 }
 
 /*

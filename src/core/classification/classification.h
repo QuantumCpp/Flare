@@ -5,4 +5,4 @@
 #include "../../system/types/TokenGroup.h"
 
 
-ValidationError ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& GpToken);
+bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& GpToken);

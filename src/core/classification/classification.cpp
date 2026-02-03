@@ -2,6 +2,7 @@
 #include "../../system/types/CommandMetaData.h"
 #include "../../system/registry/command/command_registry.h"
 #include "../../system/registry/option/option_registry.h"
+#include "../../system/registry/error/error_registry.h"
 #include <unordered_set>
 
 /*
@@ -13,18 +14,23 @@ Responsabilidades:
  4. Verificar que comandos/opciones existen
 */
 
-ValidationError ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenGroupRaw){
+bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenGroupRaw){
     
   std::unordered_set<std::string> SeenOption;
-  
+  const DataErrorDetail* ErrorSucess;
+
   if(tokens.empty()){
-    return ValidationError::EmptyInput;
+    ErrorSucess = GetError(ValidationError::EmptyInput);
+    ErrorSucess->handler(ErrorSucess);
+    return false;
   }
   
   Token tokenFront = tokens.front();
 
   if(tokenFront.type != TypeToken::Command){
-    return ValidationError::CommandIncorrectPosition;
+    ErrorSucess = GetError(ValidationError::CommandIncorrectPosition);
+    ErrorSucess->handler(ErrorSucess);
+    return false;
   }
 
   for(size_t i = 0 ; i < tokens.size() ; i++){
@@ -34,7 +40,9 @@ ValidationError ClasificationDataToken(const std::vector<Token>& tokens, TokenGr
     if(token.type == TypeToken::Command){
       const CommandMetaData* CommandData = FindCommand(token.name);
       if(!CommandData){
-        return ValidationError::CommandNotFound;
+        ErrorSucess = GetError(ValidationError::CommandNotFound);
+        ErrorSucess->handler(ErrorSucess);
+        return false;
       }
       else{
         TokenGroupRaw.command.emplace_back(token);
@@ -54,7 +62,9 @@ ValidationError ClasificationDataToken(const std::vector<Token>& tokens, TokenGr
     if(token.type == TypeToken::Option){
       const OptionMetaData* OptionData = FindOption(token.name);
       if(!OptionData){
-        return ValidationError::OptionNotFound;
+        ErrorSucess = GetError(ValidationError::OptionNotFound);
+        ErrorSucess->handler(ErrorSucess);
+        return false;
       }
       else{
         token.name = OptionData->default_name;
@@ -75,13 +85,17 @@ ValidationError ClasificationDataToken(const std::vector<Token>& tokens, TokenGr
 
   }  
   if(TokenGroupRaw.command.empty()){
-    return ValidationError::NoCommand;
+    ErrorSucess = GetError(ValidationError::NoCommand);
+    ErrorSucess->handler(ErrorSucess);
+    return false;
   }
 
   if(TokenGroupRaw.command.size() > 1){
-    return ValidationError::MultipleCommands;
+    ErrorSucess = GetError(ValidationError::MultipleCommands);
+    ErrorSucess->handler(ErrorSucess);
+    return false;
   }
 
-  return ValidationError::AllCorrect;
+  return true;
 }
 

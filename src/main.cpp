@@ -9,8 +9,7 @@
 #include "core/classification/classification.h"
 #include "core/validation/validation.h"
 #include "core/execution/execution.h"
-#include "system/registry/error/error_registry.h"
-
+#include "system/types/DataError.h"
 
 int main(int argc, char* argv[]){
   //Registro de todos los comandos | opciones | errores actuales
@@ -33,34 +32,22 @@ int main(int argc, char* argv[]){
   TokenGroup TokenGroupRaw;
   
   //Realizar el proceso de clasificacion
-  ValidationError ErrorSuccess = ClasificationDataToken(TokenRaw, TokenGroupRaw);
+  bool ErrorSuccess = ClasificationDataToken(TokenRaw, TokenGroupRaw);
   const DataErrorDetail* ErrorDetail;
   
-  if(ErrorSuccess != ValidationError::AllCorrect){
-    ErrorDetail = GetError(ErrorSuccess);
-    if(ErrorDetail){
-      ErrorDetail->handler(ErrorDetail);
-    }
+  if(!ErrorSuccess){
     return 1;
   };
   
   //Realiar proceso de validacion
   ErrorSuccess = ValidationDataToken(TokenGroupRaw); 
-  if(ErrorSuccess != ValidationError::AllCorrect){
-    ErrorDetail = GetError(ErrorSuccess);
-    if(ErrorDetail){
-      ErrorDetail->handler(ErrorDetail);  
-    }
+  if(!ErrorSuccess){
     return 1;
   };
 
   //Realizar proceso de ejecucion
   ErrorSuccess = ExecutedProccess(TokenGroupRaw);
-  if(ErrorSuccess != ValidationError::AllCorrect){
-    ErrorDetail = GetError(ErrorSuccess);
-    if(ErrorDetail){
-      ErrorDetail->handler(ErrorDetail);
-    }
+  if(!ErrorSuccess){
     return 1;
   }
 

@@ -6,6 +6,16 @@
 
 void RegisterAllError() {
 
+    {
+      DataErrorDetail err;
+      err.ErrorID = ValidationError::CommandNotImplemented;
+      err.NameError = "CommandNotImplemented";
+      err.ShortDetail = "No se ha creado una funcion para este comando";
+      err.handler = PrintDetailGenericError;
+      RegisterError(err);
+
+    }  
+
     // ================= Input / Syntax =================
     {
         DataErrorDetail err;
