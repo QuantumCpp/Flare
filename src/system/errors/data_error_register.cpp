@@ -11,7 +11,7 @@ void RegisterAllError() {
       err.ErrorID = ValidationError::CommandNotImplemented;
       err.NameError = "CommandNotImplemented";
       err.ShortDetail = "No se ha creado una funcion para este comando";
-      err.handler = PrintDetailGenericError;
+      err.handler = PrintCommandNotImplementedError;
       RegisterError(err);
 
     }  
@@ -21,7 +21,7 @@ void RegisterAllError() {
         DataErrorDetail err;
         err.ErrorID = ValidationError::EmptyInput;
         err.NameError = "EmptyArguments";
-        err.ShortDetail = "No se introdujo ningun elemento";
+        err.ShortDetail = "entry without empty\n";
         err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
@@ -30,8 +30,8 @@ void RegisterAllError() {
         DataErrorDetail err;
         err.ErrorID = ValidationError::InvalidSyntax;
         err.NameError = "InvalidSyntax";
-        err.ShortDetail = "La sintaxis de entrada es invalida";
-        err.handler = PrintDetailGenericError;
+        err.ShortDetail = "invalid syntax";
+        err.handler =  PrintDetailGenericError;
         RegisterError(err);
     }
 
@@ -40,7 +40,7 @@ void RegisterAllError() {
         DataErrorDetail err;
         err.ErrorID = ValidationError::NoCommand;
         err.NameError = "NoCommand";
-        err.ShortDetail = "No se encontro ningun comando";
+        err.ShortDetail = "no command has been entered";
         err.handler = PrintDetailGenericError;
         RegisterError(err);
     }
@@ -58,8 +58,8 @@ void RegisterAllError() {
         DataErrorDetail err;
         err.ErrorID = ValidationError::CommandNotFound;
         err.NameError = "CommandNotFound";
-        err.ShortDetail = "El comando no existe";
-        err.handler = PrintDetailGenericError;
+        err.ShortDetail = "command not found";
+        err.handler = PrintCommandNotFoundError;
         RegisterError(err);
     }
 
@@ -78,7 +78,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::OptionNotFound;
         err.NameError = "OptionNotFound";
         err.ShortDetail = "La opcion no existe";
-        err.handler = PrintDetailGenericError;
+        err.handler = PrintOptionNotFoundError;
         RegisterError(err);
     }
 
@@ -244,7 +244,7 @@ void RegisterAllError() {
         err.ErrorID = ValidationError::PathDoesNotExist;
         err.NameError = "PathDoesNotExist";
         err.ShortDetail = "La ruta no existe";
-        err.handler = PrintDetailGenericError;
+        err.handler = PrintPathNotExistError;
         RegisterError(err);
     }
 
