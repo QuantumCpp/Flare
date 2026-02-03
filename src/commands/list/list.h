@@ -2,5 +2,5 @@
 #include "../../system/types/ValidationError.h"
 #include "../../system/types/TokenGroup.h"
 
-ValidationError CommandList(const TokenGroup& TokenGroupRaw);
+bool CommandList(const TokenGroup& TokenGroupRaw);
 
