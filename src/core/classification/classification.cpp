@@ -17,9 +17,9 @@ Responsabilidades:
 bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenGroupRaw){
     
   std::unordered_set<std::string> SeenOption;
-  const DataErrorDetail* ErrorSucess;
+  const DataErrorDetail* ErrorSucess = nullptr;
 
-  if(tokens.empty()){
+  if(tokens.empty() && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::EmptyInput);
     ErrorSucess->handler(ErrorSucess);
     return false;
@@ -27,7 +27,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
   
   Token tokenFront = tokens.front();
 
-  if(tokenFront.type != TypeToken::Command){
+  if(tokenFront.type != TypeToken::Command && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::CommandIncorrectPosition);
     ErrorSucess->handler(ErrorSucess);
     return false;
@@ -41,8 +41,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
       const CommandMetaData* CommandData = FindCommand(token.name);
       if(!CommandData){
         ErrorSucess = GetError(ValidationError::CommandNotFound);
-        ErrorSucess->handler(ErrorSucess);
-        return false;
+        break;
       }
       else{
         TokenGroupRaw.command.emplace_back(token);
@@ -63,8 +62,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
       const OptionMetaData* OptionData = FindOption(token.name);
       if(!OptionData){
         ErrorSucess = GetError(ValidationError::OptionNotFound);
-        ErrorSucess->handler(ErrorSucess);
-        return false;
+        break;
       }
       else{
         token.name = OptionData->default_name;
@@ -84,14 +82,17 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
     }
 
   }  
-  if(TokenGroupRaw.command.empty()){
+  if(TokenGroupRaw.command.empty() && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::NoCommand);
+  }
+
+  if(TokenGroupRaw.command.size() > 1 && !ErrorSucess){
+    ErrorSucess = GetError(ValidationError::MultipleCommands);
     ErrorSucess->handler(ErrorSucess);
     return false;
   }
-
-  if(TokenGroupRaw.command.size() > 1){
-    ErrorSucess = GetError(ValidationError::MultipleCommands);
+  
+  if(ErrorSucess){
     ErrorSucess->handler(ErrorSucess);
     return false;
   }

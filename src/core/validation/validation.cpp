@@ -26,7 +26,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
   const std::vector<Token> GroupOptionToken = TokenGroupRaw.option;
   const CommandMetaData* CommandData;
   const OptionMetaData* OptionData;
-  const DataErrorDetail* ErrorData;
+  const DataErrorDetail* ErrorData = nullptr;
 
   CommandData = FindCommand(GroupCommandToken.front().name);
   //Comprobar si el comando admite las opciones introducidas
@@ -36,14 +36,12 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     
     if(OptionData == nullptr){
       ErrorData = GetError(ValidationError::OptionNotFound);
-      ErrorData->handler(ErrorData);
-      return false;
+      break;
     }
 
     if(!CommandData->options.count(OptionToken.name)){
       ErrorData = GetError(ValidationError::OptionForWrongCommand);
-      ErrorData->handler(ErrorData);
-      return false;
+      break; 
     }
     //Comprobar si una opcion tiene conflictos con otras introducidas
     for(size_t j = i+1 ; j < GroupOptionToken.size() ; j++){
@@ -51,8 +49,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
       for(const auto& ElementConflict : OptionData->conflicts_with){
         if(ConflictToken.name == ElementConflict){
           ErrorData = GetError(ValidationError::ConflictingOptions); 
-          ErrorData->handler(ErrorData);
-          return false;
+          break; 
         }
       }
     }
@@ -61,8 +58,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     if(OptionData->value_policy == ValuePolicy::Required){
       if(OptionToken.value == ""){
         ErrorData = GetError(ValidationError::OptionRequiresValue);
-        ErrorData->handler(ErrorData);
-        return false;
+        break;  
       }
     }
     
@@ -70,8 +66,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     if(OptionData->value_policy == ValuePolicy::None){
       if(OptionToken.value != ""){
         ErrorData = GetError(ValidationError::OptionRequiresValue);
-        ErrorData->handler(ErrorData);
-        return false;
+        break;  
       }
     }
 
@@ -86,8 +81,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
       for(const auto& ElementExist : OptionData->requieres){
         if(SetToken.count(ElementExist) == 0){
           ErrorData = GetError(ValidationError::MissingRequiredOption);
-          ErrorData->handler(ErrorData);
-          return false;
+          break; 
         };
       }
     }
@@ -97,11 +91,15 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
       ValidationError Error = ValidationTypeValueCorrect(OptionData,OptionToken); 
       if(Error != ValidationError::AllCorrect){
         ErrorData = GetError(Error);
-        ErrorData->handler(ErrorData);
-        return false;
+        break; 
       };
     }
 
+  }
+
+  if(ErrorData){
+     ErrorData->handler(ErrorData);
+     return false;
   }
 
   return true;
