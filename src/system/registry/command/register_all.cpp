@@ -2,7 +2,7 @@
 #include "../../types/CommandMetaData.h"
 #include "../../registry/option/option_registry.h"
 #include "../../registry/command/command_registry.h"
-
+#include "../../../commands/list/list.h"
 
 void RegisterAllCommand(){
   //Comando list 
@@ -22,6 +22,7 @@ void RegisterAllCommand(){
   list.options["--long"] = FindOption("--long");
   list.options["--simple"] = FindOption("--simple");
   list.value_policy = ValuePolicy::Optional;
+  list.handler = CommandList;
 
   CommandRegister(list);
 

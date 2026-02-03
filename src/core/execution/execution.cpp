@@ -9,13 +9,13 @@ bool ExecutedProccess(const TokenGroup& TokenGroupValidate){
   const CommandMetaData* Command = FindCommand(CommandSelect.name);
   const DataErrorDetail* ErrorSucess;
 
-  if(!Command->handler(CommandSelect.name)){
-    ErrorSucess = GetError(ValidationError::CommandNotImplemented);
-    ErrorSucess->handler(ErrorSucess);
-    return false;
-  }
+  //if(!Command->handler(TokenGroupValidate)){
+    //ErrorSucess = GetError(ValidationError::CommandNotImplemented);
+    //ErrorSucess->handler(ErrorSucess, CommandSelect.name , std::vector<std::string>{""});
+    //return false;
+  //}
 
-  Command->handler(CommandSelect.name);
+  Command->handler(TokenGroupValidate);
 
   return true;
 }

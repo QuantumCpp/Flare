@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include "OptionMetaData.h"
+#include "TokenGroup.h"
 #include "ValuePolicy.h"
 
 
@@ -14,7 +15,5 @@ struct CommandMetaData{
   std::unordered_map<std::string,const OptionMetaData* > options;
   ValuePolicy value_policy;
 
-  std::function<bool(const std::string& )> handler = [] (const std::string& ){
-    return false;
-  };
+  std::function<bool(const TokenGroup& )> handler;
 };

@@ -21,7 +21,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
 
   if(tokens.empty() && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::EmptyInput);
-    ErrorSucess->handler(ErrorSucess);
+    ErrorSucess->handler(ErrorSucess,"", std::vector<std::string>{""});
     return false;
   }
   
@@ -29,7 +29,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
 
   if(tokenFront.type != TypeToken::Command && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::CommandIncorrectPosition);
-    ErrorSucess->handler(ErrorSucess);
+    ErrorSucess->handler(ErrorSucess, "", std::vector<std::string>{""} );
     return false;
   }
 
@@ -41,6 +41,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
       const CommandMetaData* CommandData = FindCommand(token.name);
       if(!CommandData){
         ErrorSucess = GetError(ValidationError::CommandNotFound);
+        ErrorSucess->handler(ErrorSucess, token.name, std::vector<std::string> {""});
         break;
       }
       else{
@@ -62,6 +63,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
       const OptionMetaData* OptionData = FindOption(token.name);
       if(!OptionData){
         ErrorSucess = GetError(ValidationError::OptionNotFound);
+        ErrorSucess->handler(ErrorSucess,token.name,std::vector<std::string>{""});
         break;
       }
       else{
@@ -84,16 +86,16 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
   }  
   if(TokenGroupRaw.command.empty() && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::NoCommand);
+    ErrorSucess->handler(ErrorSucess, "" , std::vector<std::string>{""});
   }
 
   if(TokenGroupRaw.command.size() > 1 && !ErrorSucess){
     ErrorSucess = GetError(ValidationError::MultipleCommands);
-    ErrorSucess->handler(ErrorSucess);
+    ErrorSucess->handler(ErrorSucess, "" , std::vector<std::string>{""});
     return false;
   }
   
   if(ErrorSucess){
-    ErrorSucess->handler(ErrorSucess);
     return false;
   }
 

@@ -7,6 +7,7 @@
 #include "../../utils/date_validator.h"
 #include <charconv>
 #include <unordered_set>
+#include <vector>
 
 
 /*
@@ -16,7 +17,7 @@
  declarativas y legibles.
 */
 
-ValidationError ValidationTypeValueCorrect(const OptionMetaData* OptionData ,const Token& OptionToken);
+void ValidationTypeValueCorrect(const OptionMetaData* OptionData ,const Token& OptionToken , const DataErrorDetail* ErrorDetail);
 bool IsInteger(const std::string& str);
 bool IsFloat(const std::string& str);
 
@@ -36,11 +37,13 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     
     if(OptionData == nullptr){
       ErrorData = GetError(ValidationError::OptionNotFound);
+      ErrorData->handler(ErrorData, OptionData->default_name, std::vector<std::string>{""});
       break;
     }
 
     if(!CommandData->options.count(OptionToken.name)){
       ErrorData = GetError(ValidationError::OptionForWrongCommand);
+      ErrorData->handler(ErrorData, CommandData->name, std::vector<std::string>{OptionToken.name});
       break; 
     }
     //Comprobar si una opcion tiene conflictos con otras introducidas
@@ -48,7 +51,8 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
       Token ConflictToken = GroupOptionToken[j];
       for(const auto& ElementConflict : OptionData->conflicts_with){
         if(ConflictToken.name == ElementConflict){
-          ErrorData = GetError(ValidationError::ConflictingOptions); 
+          ErrorData = GetError(ValidationError::ConflictingOptions);
+          ErrorData->handler(ErrorData, OptionData->default_name, std::vector<std::string>{ConflictToken.name});
           break; 
         }
       }
@@ -58,6 +62,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     if(OptionData->value_policy == ValuePolicy::Required){
       if(OptionToken.value == ""){
         ErrorData = GetError(ValidationError::OptionRequiresValue);
+        ErrorData->handler(ErrorData, OptionData->default_name, std::vector<std::string>{""});
         break;  
       }
     }
@@ -65,7 +70,8 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
     //Comprobar si una opcion con politica de valor no requerido tiene un valor anidado
     if(OptionData->value_policy == ValuePolicy::None){
       if(OptionToken.value != ""){
-        ErrorData = GetError(ValidationError::OptionRequiresValue);
+        ErrorData = GetError(ValidationError::OptionDoesNotAcceptValue);
+        ErrorData->handler(ErrorData, OptionData->default_name, std::vector<std::string>{OptionToken.name});
         break;  
       }
     }
@@ -81,6 +87,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
       for(const auto& ElementExist : OptionData->requieres){
         if(SetToken.count(ElementExist) == 0){
           ErrorData = GetError(ValidationError::MissingRequiredOption);
+          ErrorData->handler(ErrorData, OptionData->default_name, OptionData->requieres);
           break; 
         };
       }
@@ -88,9 +95,9 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
 
     //Comprobar si el valor anidado a la opcion tiene el tipo de valor correcto
     if(OptionToken.value != ""){
-      ValidationError Error = ValidationTypeValueCorrect(OptionData,OptionToken); 
-      if(Error != ValidationError::AllCorrect){
-        ErrorData = GetError(Error);
+      ValidationTypeValueCorrect(OptionData,OptionToken , ErrorData); 
+      if(ErrorData){
+        ErrorData->handler(ErrorData, OptionToken.name , std::vector<std::string>{OptionToken.value});
         break; 
       };
     }
@@ -98,7 +105,6 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
   }
 
   if(ErrorData){
-     ErrorData->handler(ErrorData);
      return false;
   }
 
@@ -112,7 +118,7 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw){
  El date lo analizo porque si deben de seguir un formato YYYY-MM-DD
 */
 
-ValidationError ValidationTypeValueCorrect(const OptionMetaData* OptionData ,const Token& OptionToken){
+void ValidationTypeValueCorrect(const OptionMetaData* OptionData ,const Token& OptionToken,const DataErrorDetail* ErrorDetail){
   switch(OptionData->value_type){
     case ValueType::None:
       break;
@@ -128,17 +134,22 @@ ValidationError ValidationTypeValueCorrect(const OptionMetaData* OptionData ,con
 
     case ValueType::Integer:
       if(!IsInteger(OptionToken.value)){
-        return ValidationError::InvalidValueType_Integer;
+        ErrorDetail = GetError(ValidationError::InvalidValueType_Integer);
+        ErrorDetail->handler(ErrorDetail, OptionToken.name , std::vector<std::string>{""});
       };
       break;
     case ValueType::Float:
       if(!IsFloat(OptionToken.value)){
-        return ValidationError::InvalidValueType_Float;
+        ErrorDetail = GetError(ValidationError::InvalidValueType_Float);
+        ErrorDetail->handler(ErrorDetail, OptionToken.name , std::vector<std::string>{""});
+        
       }
       break;
     case ValueType::Date:
       if(!isValidatedDate(OptionToken.value)){
-        return ValidationError::InvalidValueType_Date;
+        ErrorDetail = GetError(ValidationError::InvalidValueType_Date);
+        ErrorDetail->handler(ErrorDetail, OptionToken.name , std::vector<std::string>{OptionToken.value});
+        
       }
       break;
 
@@ -146,8 +157,6 @@ ValidationError ValidationTypeValueCorrect(const OptionMetaData* OptionData ,con
       break;
   }
 
-
-  return ValidationError::AllCorrect;
 }
 
 bool IsInteger(const std::string& str){
