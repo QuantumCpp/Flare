@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <iostream>
 #include <ranges>
+#include <chrono>
 #include "../../system/types/DataError.h"
 #include "../../system/registry/error/error_registry.h"
 #include "../../system/types/Token.h"
@@ -84,21 +85,49 @@ namespace {
     return archive_directory;
   }
 
-  void PrintInformation(const std::vector<std::string>& container_directory_name, 
+  bool PrintInformation(bool long_format, const std::vector<std::string>& container_directory_name, 
       std::unordered_map<std::string,std::vector<std::filesystem::directory_entry>>& map_entry_directory){
-
+    
     for(const auto& directory_name : container_directory_name){
-      std::cout << std::format("{} :\n",directory_name);
+      std::cout << std::format("\n{}/ :\n",directory_name);
       if(map_entry_directory.contains(directory_name)){
-        for(const auto& file : map_entry_directory[directory_name]){
-          std::cout << std::format(" {}\n",file.path().filename().string());
+        std::cout << std::format("{:=<70}\n", "");
+        if(long_format){
+          std::cout << std::format("{:<40} {:>10} {:>8} {}\n", 
+             "NAME" , "SIZE" , "TYPE" , "MODIFIED");
+          std::cout << std::format("{:-<70}\n", "");
+          for(const auto& file : map_entry_directory[directory_name]){
+              auto filename = file.path().relative_path().filename().string();
+              auto size_file = std::filesystem::is_regular_file(file) ? file.file_size() : 0;
+              std::string type_file = std::filesystem::is_directory(file) ? "DIR" : "FILE";
+            
+              auto last_file_modification = std::filesystem::last_write_time(file);
+              auto stcp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                  last_file_modification - std::filesystem::file_time_type::clock::now() + 
+                    std::chrono::system_clock::now()
+                  );
+              auto cftime = std::chrono::system_clock::to_time_t(stcp);
+
+              std::cout << std::format(" {:<40} {:>10} {:>8} {:%Y-%d-%m}\n",
+                filename,
+                size_file,
+                type_file,
+                std::chrono::system_clock::from_time_t(cftime));
+          }
+        }
+        else{
+          std::cout << std::format("{:<40} {:>10}\n" , "NAME", "TYPE");
+          std::cout << std::format("{:-<70}\n","");
+          for(const auto& file : map_entry_directory[directory_name]){
+            auto file_name = file.path().filename().string();
+            std::string type_file = std::filesystem::is_directory(file) ? "DIR" : "FILE";
+            std::cout << std::format("{:<40} {:>10}\n", file_name, type_file);
+          }
         }
       }
     }
-
+    return true;
   }
-
-
 }
 
 
@@ -109,18 +138,16 @@ bool CommandList(const TokenGroup &token_group_raw){
 
   option_exist = ExtractOptionName(token_group_raw.option);
 
-  bool recursive_active = option_exist.contains("--recursive");
-
   //obtener los nombres de los directorios y validar su existencia 
   std::vector<std::string> container_directory_name = ExtractAndValidateDirectory(container_token_positional);
   std::unordered_map<std::string,std::vector<std::filesystem::directory_entry>> map_entry_directory;
 
   for(const auto& file : container_directory_name){
     std::filesystem::path path = file;
-    map_entry_directory[file] = ExtractFilesDirectory(path, recursive_active);
+    map_entry_directory[file] = ExtractFilesDirectory(path, option_exist.contains("--recursive"));
   }
 
-  PrintInformation(container_directory_name, map_entry_directory);  
+  PrintInformation(option_exist.contains("--long"),container_directory_name, map_entry_directory);  
 
   return true;
 }

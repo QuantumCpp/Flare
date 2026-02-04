@@ -2,6 +2,7 @@
 #include <functional>
 #include <string> 
 #include "ValidationError.h"
+#include <vector>
 
 struct DataErrorDetail{
   ValidationError ErrorID;
