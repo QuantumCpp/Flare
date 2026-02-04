@@ -8,3 +8,5 @@
 # Carpetas de build
 build/
 cmake-build-*/
+
+compile_commands.json
