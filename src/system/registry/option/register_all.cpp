@@ -1,17 +1,27 @@
 #include "register_all.h"
 #include "../option/option_registry.h"
+#include "../../types/OptionMetaData.h"
+#include "../../types/ValuePolicy.h"
+#include "../../types/ValueType.h"
+#include "../../types/OptionContex.h"
 
+#include <variant>
 
 void RegisterAllOptions() {
-
+  
+  //Recurisve se trabaja directamente en la funcion, no tiene un metodo propio
   OptionMetaData recursive;
   recursive.names = {"-r", "--recursive"};
   recursive.description = "Lista subdirectorios recursivamente";
   recursive.value_policy = ValuePolicy::None;
   recursive.value_type = ValueType::None;
   recursive.default_name = "--recursive";
-  RegisterOption(recursive);
+  recursive.process_type = OptionProcessType::modifier;
+  recursive.handler = std::monostate{};
 
+  RegisterOption(recursive);
+  
+  //all por si misma no tiene un metodo
   OptionMetaData all;
   all.names = {"-a", "--all"};
   all.description = "Muestra archivos ocultos (que empiezan con .)";
@@ -19,6 +29,8 @@ void RegisterAllOptions() {
   all.value_type = ValueType::None;
   all.default_name = "--all";
   all.conflicts_with = {"--extension"};
+  all.process_type = OptionProcessType::filter;
+  all.handler = std::monostate{};
   RegisterOption(all);
 
   OptionMetaData extension;
@@ -28,6 +40,8 @@ void RegisterAllOptions() {
   extension.value_type = ValueType::String;
   extension.default_name = "--extension";
   extension.conflicts_with = {"--all"};
+  extension.process_type = OptionProcessType::filter;
+
   RegisterOption(extension);
 
   OptionMetaData minSize;
