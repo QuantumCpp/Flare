@@ -21,6 +21,7 @@ struct ModifierContext{
 
 struct PrinterContext{
   std::vector<std::string>& name_directory;
+  std::vector<std::filesystem::directory_entry>& name_file; 
   std::any format_printer;
 };
 

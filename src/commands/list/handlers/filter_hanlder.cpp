@@ -1,5 +1,5 @@
-#include "../../../types/OptionContex.h"
-#include "../../../types/OptionProcessType.h"
+#include "../../../system/types/OptionContex.h"
+#include "../../../system/types/OptionProcessType.h"
 #include <filesystem>
 #include <any>
 #include <string>
@@ -39,6 +39,15 @@ bool FilterByMaxSize(const FilterContext& context_filter){
 bool FilterPointHidden(const FilterContext& context_filter){
   const auto begin = context_filter.entry.path().filename().string();
   return begin.starts_with(".");
+}
+
+bool FilterByAfterDate(const FilterContext& context_filter){
+  
+  return true;
+}
+
+bool FilterByBeforeDate(const FilterContext& context_filter){
+  return true;
 }
 
 

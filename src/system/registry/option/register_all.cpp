@@ -4,7 +4,7 @@
 #include "../../types/ValuePolicy.h"
 #include "../../types/ValueType.h"
 #include "../../types/OptionContex.h"
-
+#include "../../../commands/list/handlers/filter_hanlder.cpp"
 #include <variant>
 
 void RegisterAllOptions() {
@@ -41,40 +41,51 @@ void RegisterAllOptions() {
   extension.default_name = "--extension";
   extension.conflicts_with = {"--all"};
   extension.process_type = OptionProcessType::filter;
-
+  extension.handler = FilterHandler(FilterByExtension);
   RegisterOption(extension);
 
-  OptionMetaData minSize;
-  minSize.names = {"-s", "--min-size"};
-  minSize.description = "Filtra archivos con tamaño mínimo";
-  minSize.value_policy = ValuePolicy::Required;
-  minSize.value_type = ValueType::Integer;
-  minSize.default_name = "--min-size";
-  RegisterOption(minSize);
+  OptionMetaData min_size;
+  min_size.names = {"-s", "--min-size"};
+  min_size.description = "Filtra archivos con tamaño mínimo";
+  min_size.value_policy = ValuePolicy::Required;
+  min_size.value_type = ValueType::Integer;
+  min_size.default_name = "--min-size";
+  min_size.process_type = OptionProcessType::filter;
+  min_size.handler = FilterHandler(FilterByMinSize);
+  RegisterOption(min_size);
 
-  OptionMetaData maxSize;
-  maxSize.names = {"--max-size"};
-  maxSize.description = "Filtra archivos con tamaño máximo";
-  maxSize.value_policy = ValuePolicy::Required;
-  maxSize.value_type = ValueType::Integer;
-  maxSize.default_name = "--max-size";
-  RegisterOption(maxSize);
+  OptionMetaData max_size;
+  max_size.names = {"--max-size"};
+  max_size.description = "Filtra archivos con tamaño máximo";
+  max_size.value_policy = ValuePolicy::Required;
+  max_size.value_type = ValueType::Integer;
+  max_size.default_name = "--max-size";
+  max_size.process_type = OptionProcessType::filter;
+  max_size.handler = FilterHandler(FilterByMaxSize);
 
-  OptionMetaData afterDate;
-  afterDate.names = {"-d", "--after-date"};
-  afterDate.description = "Filtra archivos modificados después de esta fecha";
-  afterDate.value_policy = ValuePolicy::Required;
-  afterDate.value_type = ValueType::Date;
-  afterDate.default_name = "--after-date";
-  RegisterOption(afterDate);
+  RegisterOption(max_size);
 
-  OptionMetaData beforeDate;
-  beforeDate.names = {"--before-date"};
-  beforeDate.description = "Filtra archivos modificados antes de esta fecha";
-  beforeDate.value_policy = ValuePolicy::Required;
-  beforeDate.value_type = ValueType::Date;
-  beforeDate.default_name = "--before-date";
-  RegisterOption(beforeDate);
+  OptionMetaData after_date;
+  after_date.names = {"-d", "--after-date"};
+  after_date.description = "Filtra archivos modificados después de esta fecha";
+  after_date.value_policy = ValuePolicy::Required;
+  after_date.value_type = ValueType::Date;
+  after_date.default_name = "--after-date";
+  after_date.process_type = OptionProcessType::filter;
+  after_date.handler = FilterHandler(FilterByAfterDate);
+
+  RegisterOption(after_date);
+
+  OptionMetaData before_date;
+  before_date.names = {"--before-date"};
+  before_date.description = "Filtra archivos modificados antes de esta fecha";
+  before_date.value_policy = ValuePolicy::Required;
+  before_date.value_type = ValueType::Date;
+  before_date.default_name = "--before-date";
+  before_date.process_type = OptionProcessType::filter;
+  before_date.handler = FilterHandler(FilterByBeforeDate);
+
+  RegisterOption(before_date);
 
   OptionMetaData sortBy;
   sortBy.names = {"--sort-by"};
@@ -91,6 +102,8 @@ void RegisterAllOptions() {
   reverse.value_type = ValueType::None;
   reverse.default_name = "--reverse";
   reverse.requieres = {"--sort-by"};
+  reverse.process_type = OptionProcessType::modifier;
+  reverse.handler = std::monostate{};
   RegisterOption(reverse);
 
   OptionMetaData longFormat;
