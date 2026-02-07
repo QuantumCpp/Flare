@@ -74,8 +74,7 @@ target_sources(cfiles_core
     # -------------------------
     src/utils/date_validator.cpp
     src/utils/date_validator.h
-    src/utils/string_utils.cpp
-    src/utils/string_utils.h
+   
 )
 
 # -------------------------

@@ -59,7 +59,7 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
       - Si ya aparecio sera ignorada completamente y solo sera guardada la primera vez que aparecio
      */
 
-    if(token.type == TypeToken::Option){
+    if(token.type == TypeToken::OptionGeneral){
       const OptionMetaData* OptionData = FindOption(token.name);
       if(!OptionData){
         ErrorSucess = GetError(ValidationError::OptionNotFound);

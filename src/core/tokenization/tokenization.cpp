@@ -5,12 +5,9 @@
 #include <string>
 #include "../../system/types/Token.h"
 #include "../../system/types/TypeToken.h"
-#include "../../system/types/CommandMetaData.h"
-#include "../../system/registry/command/command_registry.h"
 #include "system/registry/option/option_registry.h"
 #include "system/types/OptionMetaData.h"
 #include "system/types/ValuePolicy.h"
-#include "system/types/ValueType.h"
 #include <ranges>
 
 std::vector<Token> Parser(const std::vector<Token>& container_token_raw);
@@ -48,10 +45,16 @@ std::vector<Token> Tokenization(const std::vector<std::string>& args){
     
     //Idendificar de forma general los options largos y cortos
     if(Arguments.starts_with("-") && !OnlyPositionArguments){
-       container_token_raw.emplace_back(Token{.type = TypeToken::Option,
+      if(Arguments.starts_with("--")){
+        container_token_raw.emplace_back(Token{.type = TypeToken::LongOption,
                              .name =  Arguments,
                              .value = ""});
-      continue;
+        continue;
+      }
+       container_token_raw.emplace_back(Token{.type = TypeToken::ShortOption,
+                             .name =  Arguments,
+                             .value = ""});
+        continue;
     }
        //Tokenizacion de argumentos posicionales
       container_token_raw.emplace_back(Token{.type = TypeToken::Literal,
@@ -92,16 +95,35 @@ std::vector<Token> Parser(const std::vector<Token>& container_token_raw){
       continue;
     }
 
-    if(individual_token.type == TypeToken::Option){
+    if(individual_token.type == TypeToken::LongOption || individual_token.type == TypeToken::ShortOption){
       Token token_analisys = individual_token;
-      const OptionMetaData* data_option = FindOption(individual_token.name);
+      const OptionMetaData* data_option;
+
       //verificar si una opcion tiene dentro de si un =
       auto its = individual_token.name.find(std::string("="));
       if(its != std::string::npos){
-        token_analisys.name = data_option->default_name;
-        token_analisys.value = individual_token.name.substr(its + 1);
+        data_option = FindOption(individual_token.name.substr(0,its-1));
+        if(data_option != nullptr){
+          token_analisys.type = TypeToken::OptionGeneral;
+          token_analisys.name = data_option->default_name;
+          token_analisys.value = individual_token.name.substr(its + 1);
+        }
+        else{
+          token_analisys.type = TypeToken::OptionGeneral;
+          token_analisys.name = individual_token.name.substr(0,its);
+          token_analisys.value = individual_token.name.substr(its + 1);
+        }
+        container_token_process.emplace_back(token_analisys);
         continue;
       }
+      
+      //Si no hay opcion valida devuelve error, evitara segmentation fault 
+      data_option = FindOption(individual_token.name);
+      if(data_option == nullptr){
+        container_token_process.emplace_back(token_analisys);
+        continue;
+      }
+
       //verificacion en caso de que el siguiente valor al actual sea un literal y la opcion actual requiera de un valor 
       if(data_option->value_policy == ValuePolicy::Required && individual_token.value.empty()){
         try{
@@ -114,10 +136,25 @@ std::vector<Token> Parser(const std::vector<Token>& container_token_raw){
           continue;
 
         }catch (const std::out_of_range& e){
+           container_token_process.emplace_back(token_analisys);
           continue;
         }
       }
+      
+      //Separar argumentos en caso de que se presenten de la forma -abc en -a | -b | -c
+      if(individual_token.name.size() > 2 && individual_token.type == TypeToken::ShortOption){
+        for(const auto& element : individual_token.name){
+          if(element == '-'){
+            continue;
+          }
+          container_token_process.emplace_back(Token{.type = TypeToken::OptionGeneral, 
+                                                     .name = std::string("-") + element,
+                                                     .value = ""});
+        }
+      }
+
     }
+
     if(individual_token.type == TypeToken::Literal){
       container_token_process.emplace_back(Token{.type = TypeToken::Positional,
                                                  .name = individual_token.name,
@@ -127,4 +164,6 @@ std::vector<Token> Parser(const std::vector<Token>& container_token_raw){
   }
   return container_token_process;
 }
+
+
 
