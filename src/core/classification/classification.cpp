@@ -4,6 +4,14 @@
 #include "../../system/registry/option/option_registry.h"
 #include "../../system/registry/error/error_registry.h"
 #include <unordered_set>
+#include <vector>
+#include <string>
+#include "../../system/types/Token.h"
+#include "../../system/types/TokenGroup.h"
+#include "../../system/types/DataError.h"
+#include "../../system/types/ValidationError.h"
+#include "../../system/types/TypeToken.h"
+#include "../../system/types/OptionMetaData.h"
 
 /*
 Clasification = Agrupacion + Normalizacion
@@ -19,15 +27,13 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
   std::unordered_set<std::string> SeenOption;
   const DataErrorDetail* ErrorSucess = nullptr;
 
-  if(tokens.empty() && !ErrorSucess){
+  if(tokens.empty() && ErrorSucess == nullptr){
     ErrorSucess = GetError(ValidationError::EmptyInput);
     ErrorSucess->handler(ErrorSucess,"", std::vector<std::string>{""});
     return false;
   }
   
-  Token tokenFront = tokens.front();
-
-  if(tokenFront.type != TypeToken::Command && !ErrorSucess){
+  if(tokens.front().type != TypeToken::Command && ErrorSucess == nullptr){
     ErrorSucess = GetError(ValidationError::CommandIncorrectPosition);
     ErrorSucess->handler(ErrorSucess, "", std::vector<std::string>{""} );
     return false;
@@ -39,15 +45,13 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
     //Agrupar tokens por tipo 
     if(token.type == TypeToken::Command){
       const CommandMetaData* CommandData = FindCommand(token.name);
-      if(!CommandData){
+      if(CommandData == nullptr){
         ErrorSucess = GetError(ValidationError::CommandNotFound);
         ErrorSucess->handler(ErrorSucess, token.name, std::vector<std::string> {""});
         break;
       }
-      else{
         TokenGroupRaw.command.emplace_back(token);
         continue;
-      }
     }
     
     //Idendificar token de tipo opciones
@@ -61,21 +65,19 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
 
     if(token.type == TypeToken::OptionGeneral){
       const OptionMetaData* OptionData = FindOption(token.name);
-      if(!OptionData){
+      if(OptionData == nullptr){
         ErrorSucess = GetError(ValidationError::OptionNotFound);
         ErrorSucess->handler(ErrorSucess,token.name,std::vector<std::string>{""});
         break;
       }
-      else{
         token.name = OptionData->default_name;
-        if(SeenOption.count(token.name)){
+        if(SeenOption.contains(token.name)){
           continue;
         }
         SeenOption.insert(token.name);            
 
         TokenGroupRaw.option.emplace_back(token);
         continue;
-      }
     }
 
     if(token.type == TypeToken::Positional){
@@ -84,21 +86,20 @@ bool ClasificationDataToken(const std::vector<Token>& tokens, TokenGroup& TokenG
     }
 
   }  
-  if(TokenGroupRaw.command.empty() && !ErrorSucess){
+  if(TokenGroupRaw.command.empty() && ErrorSucess == nullptr){
     ErrorSucess = GetError(ValidationError::NoCommand);
     ErrorSucess->handler(ErrorSucess, "" , std::vector<std::string>{""});
   }
 
-  if(TokenGroupRaw.command.size() > 1 && !ErrorSucess){
+  if(TokenGroupRaw.command.size() > 1 && ErrorSucess == nullptr){
     ErrorSucess = GetError(ValidationError::MultipleCommands);
     ErrorSucess->handler(ErrorSucess, "" , std::vector<std::string>{""});
     return false;
   }
   
-  if(ErrorSucess){
+  if(ErrorSucess != nullptr){
     return false;
   }
 
   return true;
 }
-

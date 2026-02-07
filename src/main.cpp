@@ -10,6 +10,7 @@
 #include "core/validation/validation.h"
 #include "core/execution/execution.h"
 #include <string>
+#include <format>
 
 int main(int argc, char* argv[]){
   //Registro de todos los comandos | opciones | errores actuales
@@ -30,6 +31,10 @@ int main(int argc, char* argv[]){
   //Realizar el proceso de tokenizacion y guardarlos en una variable
   std::vector<Token> TokenRaw = Tokenization(ArgumentsRaw);
   TokenGroup TokenGroupRaw;
+  
+  for(const auto& elemento : TokenRaw){
+    std::cout << std::format("{:<10}", elemento.name);
+  }
   
   //Realizar el proceso de clasificacion
   bool ErrorSuccess = ClasificationDataToken(TokenRaw, TokenGroupRaw);
