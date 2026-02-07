@@ -9,13 +9,13 @@
 #include "system/types/OptionMetaData.h"
 #include "system/types/ValuePolicy.h"
 #include <ranges>
-#include <iostream>
-#include <format>
+#include <cstddef>
 
 namespace  {
   
   std::vector<Token> Parser(const std::vector<Token>& container_token_raw){
     std::vector<Token> container_token_process;
+    container_token_process.reserve(container_token_raw.size());
     bool separation_exist = false;
     std::unordered_set<std::string> see_arguments;
 
@@ -42,13 +42,13 @@ namespace  {
       }
 
       if(individual_token.type == TypeToken::LongOption || individual_token.type == TypeToken::ShortOption){
-        Token token_analisys = individual_token;
+        Token& token_analisys = individual_token;
         const OptionMetaData* data_option;
 
       //verificar si una opcion tiene dentro de si un =
         auto its = individual_token.name.find(std::string("="));
         if(its != std::string::npos){
-          data_option = FindOption(individual_token.name.substr(0,its-1));
+          data_option = FindOption(individual_token.name.substr(0,its));
           if(data_option != nullptr){
             token_analisys.type = TypeToken::OptionGeneral;
             token_analisys.name = data_option->default_name;
@@ -102,7 +102,7 @@ namespace  {
                                                      .value = ""});
           }
         }
-
+        continue;
       }
 
       if(individual_token.type == TypeToken::Literal){
@@ -113,38 +113,6 @@ namespace  {
       }
     }
     return container_token_process;
-  }
-
-  void TEST_TOKENIZATION(const std::vector<Token>& container){
-    std::cout << std::format("\n{:<10}{:>20}{:>20}\n", "ARGUMENTO" , "TIPO" , "VALOR");
-    for(const auto& elemento : container){
-
-    std::string tipo;
-    switch (elemento.type) {
-      case TypeToken::Command:
-        tipo = "COMANDO";
-        break;
-      case TypeToken::LongOption:
-        tipo = "OPCION LARGA";
-        break;
-      case TypeToken::ShortOption:
-        tipo = "OPCION CORTA";
-        break;
-      case TypeToken::Literal:
-        tipo = "LITERAL";
-        break;
-      case TypeToken::Positional:
-        tipo = "POSICIONAL";
-        break;
-      case TypeToken::Separation:
-        tipo = "SEPARACION";
-        break;
-      case TypeToken::OptionGeneral:
-        tipo = "OPCION GENERAL";
-        break;
-    }
-    std::cout<< std::format("{:<10}{:>20}{:>20}\n", elemento.name , tipo, elemento.value);
-  }
   }
 
 }
@@ -195,11 +163,7 @@ std::vector<Token> Tokenization(const std::vector<std::string>& args){
                              .value = ""});
   }
   
-  TEST_TOKENIZATION(container_token_raw);
-
   std::vector<Token> container_token_validated = Parser(container_token_raw);
-
-  TEST_TOKENIZATION(container_token_validated);
 
   return container_token_validated;
 }
