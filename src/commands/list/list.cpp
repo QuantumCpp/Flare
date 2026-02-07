@@ -15,6 +15,7 @@
 #include "../../system/types/Token.h"
 #include "../../system/types/TokenGroup.h"
 #include "../../system/types/ValidationError.h"
+#include "system/types/TypeToken.h"
 #include <format>
 
 namespace {
@@ -134,8 +135,12 @@ namespace {
 bool CommandList(const TokenGroup &token_group_raw){
   
   std::unordered_set<std::string> option_exist;
-  std::vector<Token> container_token_positional = token_group_raw.positional;  
-
+  std::vector<Token> container_token_positional = token_group_raw.positional;
+  if(token_group_raw.positional.empty()){
+    container_token_positional.emplace_back(Token{.type = TypeToken::Positional,
+                                                  .name = std::string("."),
+                                                  .value = ""}); 
+  }
   option_exist = ExtractOptionName(token_group_raw.option);
 
   //obtener los nombres de los directorios y validar su existencia 
