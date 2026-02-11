@@ -18,5 +18,4 @@ std::chrono::sys_days ParseStringDate(const std::string& string_date){
   }
 
   return parser_date;
-
 }

@@ -1,7 +1,8 @@
 // ValidationError.h
 #pragma once
 
-enum class ValidationError {
+#include <cstdint>
+enum class ValidationError : std::uint8_t {
     // Success
     AllCorrect = 0,
     

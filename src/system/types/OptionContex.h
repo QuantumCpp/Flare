@@ -10,8 +10,8 @@
 #include <any>
 
 struct FilterContext{
-  std::filesystem::directory_entry& entry;
-  std::any filter; 
+  std::vector<std::filesystem::directory_entry>& entry;
+  std::any filter;
 };
 
 struct ModifierContext{
@@ -25,7 +25,7 @@ struct PrinterContext{
   std::any format_printer;
 };
 
-using FilterHandler = std::function<bool(const FilterContext& )>;
+using FilterHandler = std::function<std::vector<std::filesystem::directory_entry>(const FilterContext& )>;
 using ModifierHandler = std::function<void(const ModifierContext& )>;
 using PrinterHandler = std::function<void(const PrinterContext& )>;
 

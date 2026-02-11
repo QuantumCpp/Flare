@@ -7,17 +7,19 @@
 #include "../../utils/date_validator.h"
 #include "system/types/ValidationError.h"
 #include <algorithm>
+#include <cctype>
 #include <charconv>
 #include <unordered_set>
 #include <vector>
 #include <string>
-#include <ranges>
+#include <cstddef>
 #include "../../system/types/Token.h"
 #include "../../system/types/TokenGroup.h"
 #include "../../system/types/DataError.h"
 #include "../../system/types/ValidationError.h"
 #include "../../system/types/ValueType.h"
 #include "../../system/types/ValuePolicy.h"
+#include <system_error>
 
 /*
  Por convencion semantica las opciones largas (o cortas) con valor deben darse de la forma
@@ -26,13 +28,126 @@
  declarativas y legibles.
 */
 
+namespace  {
+
+  bool IsInteger(const std::string& str) {
+    int value;
+    auto conversion = std::from_chars(str.data(),
+                                      str.data() + str.size(),
+                                      value);
+
+    return conversion.ec == std::errc() &&
+           conversion.ptr == str.data() + str.size();
+}
+
+bool IsFloat(const std::string& str) {
+    float value;
+    auto conversion = std::from_chars(str.data(),
+                                      str.data() + str.size(),
+                                      value);
+
+    return conversion.ec == std::errc() &&
+           conversion.ptr == str.data() + str.size();
+}
+
+bool ValidationSize(const std::string& size){
+  static std::unordered_set<std::string> prefijos_validos = {
+    "B","KB","MB", "TB" , "PB" , "EB"  
+  };
+
+  //Extraer el numero anidado
+  //La convencion valida para el tamano es [NUMERO][PREFIJO]
+  int numero;
+  std::from_chars_result resultado = std::from_chars(size.data() , size.data() + size.size() ,numero);
+  
+  //obtener el prefijo
+  if(resultado.ptr != size.size() + size.data()){
+    std::string prefijo(resultado.ptr, size.data() + size.size());
+    //convertilo a mayuscula
+    for(char& cha : prefijo ){
+      cha = toupper(cha);
+    }
+
+    if(!prefijos_validos.contains(prefijo)){
+      return false;
+    }
+  }
+  return true;
+};
+
 bool ValidationTypeValueCorrect(const OptionMetaData* OptionData,
                                 const Token& OptionToken,
-                                const DataErrorDetail* ErrorDetail);
+                                const DataErrorDetail* ErrorDetail) {
 
-bool IsInteger(const std::string& str);
-bool IsFloat(const std::string& str);
+    switch (OptionData->value_type) {
 
+        case ValueType::None:
+          return true;
+          break;
+
+        case ValueType::Size:
+          if(!ValidationSize(OptionToken.value)){
+              ErrorDetail = GetError(ValidationError::InvalidValueType_Integer);
+                ErrorDetail->handler(ErrorDetail,
+                                     OptionToken.name,
+                                     std::vector<std::string>{""});
+          }
+          return true;
+          break;
+
+        case ValueType::Path:
+          return true;
+          break;
+
+        case ValueType::String:
+          return true;
+          break;
+
+        case ValueType::Integer:
+            if (!IsInteger(OptionToken.value)) {
+                ErrorDetail = GetError(ValidationError::InvalidValueType_Integer);
+                ErrorDetail->handler(ErrorDetail,
+                                     OptionToken.name,
+                                     std::vector<std::string>{""});
+            }
+            return false;
+            break;
+
+        case ValueType::Float:
+            if (!IsFloat(OptionToken.value)) {
+                ErrorDetail = GetError(ValidationError::InvalidValueType_Float);
+                ErrorDetail->handler(ErrorDetail,
+                                     OptionToken.name,
+                                     std::vector<std::string>{""});
+            }
+            return false;
+            break;
+
+        case ValueType::Date:
+            if (!isValidatedDate(OptionToken.value)) {
+                ErrorDetail = GetError(ValidationError::InvalidValueType_Date);
+                ErrorDetail->handler(ErrorDetail,
+                                     OptionToken.name,
+                                     std::vector<std::string>{OptionToken.value});
+            }
+
+            if (!isValidateContexDate(OptionToken.value)) {
+                ErrorDetail = GetError(ValidationError::InvalidValueType_Date);
+                ErrorDetail->handler(ErrorDetail,
+                                     OptionToken.name,
+                                     std::vector<std::string>{OptionToken.value});
+            }
+            return false;
+            break;
+
+        default:
+            return true;;
+    }
+    return true;
+}
+
+
+}
 bool ValidationDataToken(TokenGroup& TokenGroupRaw) {
 
     auto const& GroupCommandToken = TokenGroupRaw.command;
@@ -124,89 +239,4 @@ bool ValidationDataToken(TokenGroup& TokenGroupRaw) {
  se deja esa validacion del string a la hora de usar la opcion.
  El date lo analizo porque si deben de seguir un formato YYYY-MM-DD
 */
-
-bool ValidationTypeValueCorrect(const OptionMetaData* OptionData,
-                                const Token& OptionToken,
-                                const DataErrorDetail* ErrorDetail) {
-
-    switch (OptionData->value_type) {
-
-        case ValueType::None:
-          return true;
-          break;
-
-        case ValueType::Enum:
-          return true;
-          break;
-
-        case ValueType::Path:
-          return true;
-          break;
-
-        case ValueType::String:
-          return true;
-          break;
-
-        case ValueType::Integer:
-            if (!IsInteger(OptionToken.value)) {
-                ErrorDetail = GetError(ValidationError::InvalidValueType_Integer);
-                ErrorDetail->handler(ErrorDetail,
-                                     OptionToken.name,
-                                     std::vector<std::string>{""});
-            }
-            return false;
-            break;
-
-        case ValueType::Float:
-            if (!IsFloat(OptionToken.value)) {
-                ErrorDetail = GetError(ValidationError::InvalidValueType_Float);
-                ErrorDetail->handler(ErrorDetail,
-                                     OptionToken.name,
-                                     std::vector<std::string>{""});
-            }
-            return false;
-            break;
-
-        case ValueType::Date:
-            if (!isValidatedDate(OptionToken.value)) {
-                ErrorDetail = GetError(ValidationError::InvalidValueType_Date);
-                ErrorDetail->handler(ErrorDetail,
-                                     OptionToken.name,
-                                     std::vector<std::string>{OptionToken.value});
-            }
-
-            if (!isValidateContexDate(OptionToken.value)) {
-                ErrorDetail = GetError(ValidationError::InvalidValueType_Date);
-                ErrorDetail->handler(ErrorDetail,
-                                     OptionToken.name,
-                                     std::vector<std::string>{OptionToken.value});
-            }
-            return false;
-            break;
-
-        default:
-            return true;;
-    }
-    return true;
-}
-
-bool IsInteger(const std::string& str) {
-    int value;
-    auto conversion = std::from_chars(str.data(),
-                                      str.data() + str.size(),
-                                      value);
-
-    return conversion.ec == std::errc() &&
-           conversion.ptr == str.data() + str.size();
-}
-
-bool IsFloat(const std::string& str) {
-    float value;
-    auto conversion = std::from_chars(str.data(),
-                                      str.data() + str.size(),
-                                      value);
-
-    return conversion.ec == std::errc() &&
-           conversion.ptr == str.data() + str.size();
-}
 

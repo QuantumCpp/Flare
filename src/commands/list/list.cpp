@@ -15,6 +15,9 @@
 #include "../../system/types/Token.h"
 #include "../../system/types/TokenGroup.h"
 #include "../../system/types/ValidationError.h"
+#include "system/registry/option/option_registry.h"
+#include "system/types/OptionContex.h"
+#include "system/types/OptionMetaData.h"
 #include "system/types/TypeToken.h"
 #include <format>
 
@@ -150,6 +153,20 @@ bool CommandList(const TokenGroup &token_group_raw){
   for(const auto& file : container_directory_name){
     std::filesystem::path path = file;
     map_entry_directory[file] = ExtractFilesDirectory(path, option_exist.contains("--recursive"));
+  }
+  
+  //aplicar filtros
+  for(const auto& opcion_filtro : token_group_raw.option){
+    const OptionMetaData* Option_handler_filter = FindOption(opcion_filtro.name);
+    if(Option_handler_filter->process_type != OptionProcessType::filter){
+      continue;
+    }
+    for(const auto& file : container_directory_name){
+      const auto& filter_func = std::get<FilterHandler>(Option_handler_filter->handler);
+      FilterContext ctx{map_entry_directory[file] , opcion_filtro.value};
+      std::vector<std::filesystem::directory_entry> new_entry = filter_func(ctx);
+      map_entry_directory[file] = std::move(new_entry);
+    }
   }
 
   PrintInformation(option_exist.contains("--long"),container_directory_name, map_entry_directory);  

@@ -9,8 +9,10 @@ bool isValidatedDate(const std::string &str){
   return std::regex_match(str, pattern);
 }
 
+
+
 bool isValidateContexDate(const std::string& str){
-   bool validate_date = true;
+  bool validate_date = true;
   std::istringstream string_date(str);
   std::chrono::sys_days parser_date;
 

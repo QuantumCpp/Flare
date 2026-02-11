@@ -1,6 +1,8 @@
 #pragma once
 
-enum class ValuePolicy{
+#include <cstdint>
+
+enum class ValuePolicy : std::uint8_t{
   None,
   Required,
   Optional

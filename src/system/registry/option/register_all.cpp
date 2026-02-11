@@ -48,7 +48,7 @@ void RegisterAllOptions() {
   min_size.names = {"-s", "--min-size"};
   min_size.description = "Filtra archivos con tamaño mínimo";
   min_size.value_policy = ValuePolicy::Required;
-  min_size.value_type = ValueType::Integer;
+  min_size.value_type = ValueType::Size;
   min_size.default_name = "--min-size";
   min_size.process_type = OptionProcessType::filter;
   min_size.handler = FilterHandler(FilterByMinSize);
@@ -58,7 +58,7 @@ void RegisterAllOptions() {
   max_size.names = {"--max-size"};
   max_size.description = "Filtra archivos con tamaño máximo";
   max_size.value_policy = ValuePolicy::Required;
-  max_size.value_type = ValueType::Integer;
+  max_size.value_type = ValueType::Size;
   max_size.default_name = "--max-size";
   max_size.process_type = OptionProcessType::filter;
   max_size.handler = FilterHandler(FilterByMaxSize);
@@ -91,7 +91,7 @@ void RegisterAllOptions() {
   sortBy.names = {"--sort-by"};
   sortBy.description = "Ordena resultados por nombre, tamaño o fecha";
   sortBy.value_policy = ValuePolicy::Required;
-  sortBy.value_type = ValueType::Enum;
+  //sortBy.value_type = ValueType::;
   sortBy.default_name = "--sort-by";
   RegisterOption(sortBy);
 

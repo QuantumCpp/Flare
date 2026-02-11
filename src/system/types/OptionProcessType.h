@@ -1,7 +1,8 @@
 #ifndef OPTION_PROCESS_TYPE_H
 #define OPTION_PROCESS_TYPE_H
 
-enum class OptionProcessType{
+#include <cstdint>
+enum class OptionProcessType : std::uint8_t{
   filter,
   modifier,
   printer

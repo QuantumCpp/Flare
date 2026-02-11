@@ -32,10 +32,6 @@ int main(int argc, char* argv[]){
   std::vector<Token> TokenRaw = Tokenization(ArgumentsRaw);
   TokenGroup TokenGroupRaw;
   
-  for(const auto& elemento : TokenRaw){
-    std::cout << std::format("{:<10}", elemento.name);
-  }
-  
   //Realizar el proceso de clasificacion
   bool ErrorSuccess = ClasificationDataToken(TokenRaw, TokenGroupRaw);
   
